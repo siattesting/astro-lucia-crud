@@ -7,6 +7,9 @@ dependencies:
   astro:
     specifier: ^3.0.12
     version: 3.0.12
+  lucia:
+    specifier: ^2.7.2
+    version: 2.7.2
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
@@ -2007,6 +2010,10 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       yallist: 4.0.0
+    dev: false
+
+  /lucia@2.7.2:
+    resolution: {integrity: sha512-fEsD5EW8k3JxEhp3Cor+ar3dAfSY/QAjN/gQArfxbp1bludR7zzyW6s/gmy1cuGvABASTuZxgwCyBz0Osbg6WA==}
     dev: false
 
   /magic-string@0.30.5:
