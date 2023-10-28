@@ -1,8 +1,23 @@
 ---
 import Layout from '../layouts/Layout.astro'
 const pageTitle = "About Page"
+const tasks = [
+  { id: 1, title: 'created basic skeleton' },
+  { id: 2, title: 'added lucia with pnpm add lucia' },
+  { id: 3, title: 'added via pnpm add drizzle-orm postgres' },
+  { id: 4, title: "added Lucia adapter for sqlite to try with Turso: pnpm add @lucia-auth/adapter-sqlite"},
+  { id: 5, title: "added @linsql/client as per the docs for Turso on drizzle orm website"},
+  { id: 6, title: "Configured env.d.ts as per Lucia documentation for Astro"},
+  { id: 7, title: "Added the middleware fil in src/middleware.ts"}
+];
 ---
 
 <Layout title={pageTitle}>
     <h2>About Page</h2>
+    <ul>
+        {tasks.map(task=> <li>{task.id} - {task.title}</li>)}
+    </ul>
+    
+
+
 </Layout>

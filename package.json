@@ -11,8 +11,15 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.2.1",
+    "@libsql/client": "^0.3.6",
+    "@lucia-auth/adapter-sqlite": "^2.0.1",
     "astro": "^3.0.12",
+    "drizzle-orm": "^0.28.6",
     "lucia": "^2.7.2",
+    "postgres": "^3.4.2",
     "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.19.13"
   }
 }
