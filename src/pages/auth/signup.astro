@@ -2,7 +2,11 @@
 import Layout from '../../layouts/Layout.astro'
 const pageTitle = "Signup Page"
 import { auth } from "../../lib/lucia";
+import { validateEmail } from '../../lib/utils';
 const locals = Astro.locals
+
+const errors = { username: "", email: "", password: "", passwordConfirm: ""}
+const hasErrors = Object.values(errors).some(msg => msg)
 
 let errorMessage: string | null = null;
 
@@ -10,18 +14,23 @@ let errorMessage: string | null = null;
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();
 	const username = formData.get("username");
-    const email = formData.get("email");
-	const password = formData.get("password");
+    const password = formData.get("password");	
+    const passwordConfirm = formData.get("passwordConfirm");
 	// basic check
-	const validUsername =
-		typeof username === "string" &&
-		username.length >= 4 &&
-		username.length <= 31;
-	const validPassword =
-		typeof password === "string" &&
-		password.length >= 6 &&
-		password.length <= 255;
-	if (validUsername && validPassword) {
+    if (typeof username !== "string" || username.length < 3) {
+        errors.username += "Please enter a username of at least 3 characters ";
+    }
+    if (typeof username !== "string" || !validateEmail(username)) {
+        errors.email += "Please enter a valid email such as example@domain.com. ";
+    }
+    if (typeof password !== "string" || password.length < 6) {
+        errors.password += "Passwords must be at leat 6 characters long ";
+    }
+    if (typeof passwordConfirm !== "string" || passwordConfirm !== password) {
+        errors.passwordConfirm += "Passwords and confrimation password must macth ";
+    }
+    const hasErrors = Object.values(errors).some(msg => msg)
+	if (!hasErrors) {
 		try {
 			const user = await auth.createUser({
 				key: {
@@ -38,7 +47,7 @@ if (Astro.request.method === "POST") {
 				attributes: {}
 			});
 			Astro.locals.auth.setSession(session); // set session cookie
-			return Astro.redirect("/", 302); // redirect to profile page
+			return Astro.redirect("/auth/profile", 302); // redirect to profile page
 		} catch (e) {
 			// this part depends on the database you're using
 			// check for unique constraint error in user table
@@ -61,12 +70,15 @@ if (Astro.request.method === "POST") {
     <h1>Sign up</h1>
 		<form method="POST">
 			<label for="username">Username</label>
-			<input type="text" name="username" id="username" /><br />
-            <label for="email">Email</label>
-			<input type="email" name="email" id="email" /><br />
+			<input type="email" name="username" id="username" placeholder="Your email: user@example.com" /><br />
 			<label for="password">Password</label>
 			<input type="password" name="password" id="password" /><br />
+            <label for="passwordConfirm">Confirm Password</label>
+			<input type="password" name="passwordConfirm" id="passwordConfirm" /><br />
 			<input type="submit" />
 		</form>
-		<a href="/login">Sign in</a>
+        <hr/ >
+        <p>
+            Already registered ? <a href="/auth/login">Login</a>
+        </p>
 </Layout>
