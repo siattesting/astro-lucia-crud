@@ -1,6 +1,8 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
 import '../app.css'
+const session = await Astro.locals.auth.validate();
+
 interface Props {
 	title: string;
 }
@@ -23,10 +25,36 @@ const { title } = Astro.props;
 		<nav>
 			<a href="/">Home</a>
 			<a href="/about">About</a>
+			<a href="/transactions">Transactions</a>
+			<a href="/partners">Partners</a>
+			{!session &&
 			<a href="/auth/login">Login</a>
 			<a href="/auth/signup">Signup</a>
+			}
+			{session && 
+			<a href="/auth/profile">Profile</a>
+			}
 		</nav>
 		<slot />
 	</body>
 </html>
+
+<style is:global>
+	body {
+  font-size: 1.5em;
+}
+
+nav {
+  display: flex;
+}
+nav a {
+  margin-right: 2px;
+  margin-bottom: 2px;
+  text-decoration: none;
+}
+
+nav a:active {
+	border-bottom: 2px solid green;
+}
+</style>
 

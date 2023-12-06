@@ -1,0 +1,67 @@
+---
+import Layout from '../../layouts/Layout.astro'
+const pageTitle = "Create Transaction";
+// Protect the page for only authenticated users
+const session = await Astro.locals.auth.validate();
+if (!session) return Astro.redirect("/auth/login", 302);
+
+// Process the form
+const errors = { title: "", content: "", amount: "", type: "", date_operation: ""}
+
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData();
+        const title = data.get("title")
+        const content = data.get("content");
+        const amount = Number(data.get("amount"));
+        const type = data.get("type");
+        const date_operation = data.get("date");
+        const author = session.user.username;
+        // Validation
+        if (typeof title !== "string" || title.length < 3) {
+            errors.title += "Please enter a title of at least 3 characters"
+        }
+        if (typeof content !== "string" || content.length < 3) {
+            errors.content += "Please enter a description of at least 3 characters"
+        }
+        if (typeof amount !== "number" ) {
+            errors.amount += "Please enter a valid amount, not equal to zero"
+        }
+        // Do something with the data
+        const hasErrors = Object.values(errors).some(msg => msg)
+        if (!hasErrors) {
+            
+                const newTransaction = {
+                    title, content, amount, type, date_operation, author
+                }
+                await locals.pb.collection("transactions").create(newTransaction)
+                return Astro.redirect('/transactions')
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        }
+        console.log(error)
+    }
+}
+---
+<Layout title={pageTitle}>
+    <div>
+        <h2>{pageTitle}</h2>
+        <form method="POST">
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title" placeholder="Title" />
+            <label for="content">Description</label>
+            <input type="text" name="content" id="content"  placeholder="Description"/>
+            <label for="amount">Amount</label>
+            <input type="number" name="amount" id="amount" />
+            <label for="date">Date</label>
+            <input type="date" name="date" id="date" />
+            <label for="type">Type de flux</label>
+            <select name="type" id="type">
+              {["DEPENSES", "RECETTES"].map(type => <option>{type}</option>)}
+            </select>
+            <button type="submit">Save</button>
+          </form>
+    </div>
+</Layout>
