@@ -14,6 +14,7 @@ let errorMessage: string | null = null;
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();
 	const username = formData.get("username");
+	const email = formData.get("username")
     const password = formData.get("password");	
     const passwordConfirm = formData.get("passwordConfirm");
 	// basic check
@@ -23,6 +24,7 @@ if (Astro.request.method === "POST") {
     if (typeof username !== "string" || !validateEmail(username)) {
         errors.email += "Please enter a valid email such as example@domain.com. ";
     }
+
     if (typeof password !== "string" || password.length < 6) {
         errors.password += "Passwords must be at leat 6 characters long ";
     }
@@ -34,11 +36,13 @@ if (Astro.request.method === "POST") {
 		try {
 			const user = await auth.createUser({
 				key: {
-					providerId: "username", // auth method
-					providerUserId: username.toLowerCase(), // unique id when using "username" auth method
+					providerId: "email", // auth method
+					providerUserId: email.toLowerCase(), // unique id when using "username" auth method
 					password // hashed by Lucia
 				},
 				attributes: {
+					email,
+					email_verified: Number(false),
 					username
 				}
 			});
@@ -47,14 +51,16 @@ if (Astro.request.method === "POST") {
 				attributes: {}
 			});
 			Astro.locals.auth.setSession(session); // set session cookie
+			// Send verification token for email validation
+			const token = await generateEmailVerificationToken(user.userId)
 			return Astro.redirect("/auth/profile", 302); // redirect to profile page
 		} catch (e) {
 			// this part depends on the database you're using
 			// check for unique constraint error in user table
 			if (
-				e instanceof SomeDatabaseError &&
-				e.message === USER_TABLE_UNIQUE_CONSTRAINT_ERROR
+				e 
 			) {
+				console.error(e)
 				errorMessage = "Username already taken";
 			} else {
 				errorMessage = "An unknown error occurred";

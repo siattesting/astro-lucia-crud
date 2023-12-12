@@ -15,7 +15,7 @@ export const auth = lucia({
   env: import.meta.env.DEV ? 'DEV' : 'PROD',
   middleware: astro(),
   adapter: libsql(tursodb, {
-    user: 'user',
+    user: 'user_auth',
     session: 'user_session',
     key: 'user_key',
   }),
