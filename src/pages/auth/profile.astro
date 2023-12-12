@@ -4,12 +4,15 @@ const pageTitle = "Login Page"
 // Protect the page for only authenticated users
 const session = await Astro.locals.auth.validate();
 if (!session) return Astro.redirect("/auth/login", 302);
+if (!session.user.emailVerified) {
+	return Astro.redirect("/email-verification")
+}
 ---
 
 <Layout title={pageTitle}>
 		<h1>Profile</h1>
 		<p>User id: {session.user.userId}</p>
-		<p>Username: {session.user.username}</p>
+		<p>Username: {session.user.email}</p>
 		<form method="POST" action="/auth/logout">
 			<input type="submit" value="Sign out" />
 		</form>

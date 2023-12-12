@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro'
 const pageTitle = "Signup Page"
 import { auth } from "../../lib/lucia";
+import { generateEmailVerificationToken } from '../../lib/token';
 import { validateEmail } from '../../lib/utils';
 const locals = Astro.locals
 

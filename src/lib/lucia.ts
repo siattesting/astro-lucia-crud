@@ -19,9 +19,14 @@ export const auth = lucia({
     session: 'user_session',
     key: 'user_key',
   }),
+  sessionCookie: {
+    expires: false,
+  },
   getUserAttributes: (data) => {
     return {
       username: data.username,
+      email: data.email,
+      emailVerified: Boolean(data.email_verified),
     };
   },
 });
