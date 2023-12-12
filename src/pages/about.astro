@@ -4,7 +4,6 @@ import { mytasks } from '../lib/tasks';
 const pageTitle = "About Page"
 
 const locals = Astro.locals
-const currentUser = locals.user
 const session = await Astro.locals.auth.validate();
 const userLoggedIn = session?.user
 ---

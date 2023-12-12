@@ -34,7 +34,7 @@ if (Astro.request.method === "POST") {
                 const newTransaction = {
                     title, content, amount, type, date_operation, author
                 }
-                await locals.pb.collection("transactions").create(newTransaction)
+                // await locals.pb.collection("transactions").create(newTransaction)
                 return Astro.redirect('/transactions')
         }
     } catch (error) {

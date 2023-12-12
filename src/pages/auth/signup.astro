@@ -1,22 +1,22 @@
 ---
 import Layout from '../../layouts/Layout.astro'
+import { sendEmailVerificationLink } from '../../lib/email';
 const pageTitle = "Signup Page"
 import { auth } from "../../lib/lucia";
 import { generateEmailVerificationToken } from '../../lib/token';
 import { validateEmail } from '../../lib/utils';
-const locals = Astro.locals
 
 const errors = { username: "", email: "", password: "", passwordConfirm: ""}
-const hasErrors = Object.values(errors).some(msg => msg)
 
-let errorMessage: string | null = null;
 
 // check for form submissions
 if (Astro.request.method === "POST") {
+	let errorMessage: string | null = null;
+
 	const formData = await Astro.request.formData();
-	const username = formData.get("username");
-	const email = formData.get("username")
-    const password = formData.get("password");	
+	const username = formData.get("username") as string;
+	const email = formData.get("username") as string;
+    const password = formData.get("password") as string;	
     const passwordConfirm = formData.get("passwordConfirm");
 	// basic check
     if (typeof username !== "string" || username.length < 3) {
@@ -38,12 +38,12 @@ if (Astro.request.method === "POST") {
 			const user = await auth.createUser({
 				key: {
 					providerId: "email", // auth method
-					providerUserId: email.toLowerCase(), // unique id when using "username" auth method
+					providerUserId: email?.toLowerCase(), // unique id when using "username" auth method
 					password // hashed by Lucia
 				},
 				attributes: {
 					email,
-					email_verified: Number(false),
+					email_verified: false,
 					username
 				}
 			});
@@ -54,6 +54,7 @@ if (Astro.request.method === "POST") {
 			Astro.locals.auth.setSession(session); // set session cookie
 			// Send verification token for email validation
 			const token = await generateEmailVerificationToken(user.userId)
+			await sendEmailVerificationLink(token);
 			return Astro.redirect("/auth/profile", 302); // redirect to profile page
 		} catch (e) {
 			// this part depends on the database you're using
